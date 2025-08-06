@@ -35,7 +35,7 @@ jobs:
       github.event_name == 'issues' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
-       contains(github.event.comment.body, '@gemini-cli /triage') &&
+       contains(github.event.comment.body, '@llxprt /triage') &&
        (github.event.comment.author_association == 'OWNER' ||
         github.event.comment.author_association == 'MEMBER' ||
         github.event.comment.author_association == 'COLLABORATOR'))
@@ -56,7 +56,7 @@ jobs:
           private-key: '${{ secrets.APP_PRIVATE_KEY }}'
 
       - name: 'Run Gemini Issue Triage'
-        uses: 'google-github-actions/run-gemini-cli@v0'
+        uses: 'acoliver/run-llxprt-code@v1'
         id: 'gemini_issue_triage'
         env:
           GITHUB_TOKEN: '${{ steps.generate_token.outputs.token || secrets.GITHUB_TOKEN }}'
@@ -65,7 +65,7 @@ jobs:
           ISSUE_NUMBER: '${{ github.event.issue.number }}'
           REPOSITORY: '${{ github.repository }}'
         with:
-          gemini_cli_version: '${{ vars.GEMINI_CLI_VERSION }}'
+          llxprt_version: '${{ vars.LLXPRT_VERSION }}'
           gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
           gcp_project_id: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
           gcp_location: '${{ vars.GOOGLE_CLOUD_LOCATION }}'

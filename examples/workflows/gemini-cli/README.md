@@ -1,6 +1,6 @@
 # Gemini CLI Assistant
 
-In this guide you will learn how to use the Gemini CLI Assistant via GitHub Actions. It serves as an on-demand collaborator you can quickly delegate work to, invoked directly in GitHub Pull Request and Issue comments to perform a wide range of tasks—from code analysis and modifications to project management. When you invoke the workflow via `@gemini-cli`, it uses a customizable set of tools to understand the context, execute your request, and respond within the same thread.
+In this guide you will learn how to use the Gemini CLI Assistant via GitHub Actions. It serves as an on-demand collaborator you can quickly delegate work to, invoked directly in GitHub Pull Request and Issue comments to perform a wide range of tasks—from code analysis and modifications to project management. When you invoke the workflow via `@llxprt`, it uses a customizable set of tools to understand the context, execute your request, and respond within the same thread.
 
 - [Gemini CLI Assistant](#gemini-cli-assistant)
   - [Overview](#overview)
@@ -38,7 +38,7 @@ To use this workflow, you can utilize either of the following methods:
 
 ```bash
 mkdir -p .github/workflows
-curl -o .github/workflows/gemini-cli.yml https://raw.githubusercontent.com/google-github-actions/run-gemini-cli/main/workflows/gemini-cli/gemini-cli.yml
+curl -o .github/workflows/gemini-cli.yml https://raw.githubusercontent.com/acoliver/run-llxprt-code/main/workflows/gemini-cli/gemini-cli.yml
 ```
 
 ## Usage
@@ -55,14 +55,14 @@ The Gemini CLI Assistant workflow is intentionally configured *not* to respond t
 
 ### How to Invoke the Gemini CLI Workflow
 
-To use the general GitHub CLI workflow, just mention `@gemini-cli` in a comment in a GitHub Pull Request or an Issue, followed by your request. For example:
+To use the general GitHub CLI workflow, just mention `@llxprt` in a comment in a GitHub Pull Request or an Issue, followed by your request. For example:
 
 ```
-@gemini-cli Please explain what the `main.go` file does.
+@llxprt Please explain what the `main.go` file does.
 ```
 
 ```
-@gemini-cli Refactor the `calculateTotal` function in `src/utils.js` to improve readability.
+@llxprt Refactor the `calculateTotal` function in `src/utils.js` to improve readability.
 ```
 
 ## Interaction Flow
@@ -72,7 +72,7 @@ The workflow follows a clear, multi-step process to handle requests:
 ```mermaid
 flowchart TD
     subgraph "User Interaction"
-        A[User posts comment with '@gemini-cli <request>']
+        A[User posts comment with '@llxprt <request>']
         F{Approve plan?}
     end
 
@@ -104,7 +104,7 @@ flowchart TD
 ```
 
 1.  **Acknowledge**: The action first posts a brief comment to let the user know the request has been received.
-2.  **Plan (if needed)**: For requests that may involve code changes or complex actions, the AI will first create a step-by-step plan. It will post this plan as a comment and wait for the user to approve it by replying with `@gemini-cli plan#123 approved`. This ensures the user has full control before any changes are made.
+2.  **Plan (if needed)**: For requests that may involve code changes or complex actions, the AI will first create a step-by-step plan. It will post this plan as a comment and wait for the user to approve it by replying with `@llxprt plan#123 approved`. This ensures the user has full control before any changes are made.
 3.  **Execute**: Once the plan is approved (or if no plan was needed), it runs the Gemini model, providing it with the user's request, repository context, and a set of tools.
 4.  **Commit (if needed)**: If the AI uses tools to modify files, it will automatically commit and push the changes to the branch.
 5.  **Respond**: The AI posts a final, comprehensive response as a comment on the issue or pull request.
@@ -124,19 +124,19 @@ More Gemini CLI Assistant workflow examples:
 ### Asking a Question
 
 ```
-@gemini-cli What is the purpose of the `telemetry.js` script?
+@llxprt What is the purpose of the `telemetry.js` script?
 ```
 
 ### Requesting a Code Change
 
 ```
-@gemini-cli In `package.json`, please add a new script called "test:ci" that runs `npm test`.
+@llxprt In `package.json`, please add a new script called "test:ci" that runs `npm test`.
 ```
 
 ### Summarizing an Issue
 
 ```
-@gemini-cli Can you summarize the main points of this issue thread for me?
+@llxprt Can you summarize the main points of this issue thread for me?
 ```
 
 [Google AI Studio]: https://aistudio.google.com/apikey

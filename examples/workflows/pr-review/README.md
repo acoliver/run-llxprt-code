@@ -50,7 +50,7 @@ To use this workflow, you can use either of the following methods:
 
 ```bash
 mkdir -p .github/workflows
-curl -o .github/workflows/gemini-pr-review.yml https://raw.githubusercontent.com/google-github-actions/run-gemini-cli/main/workflows/pr-review/gemini-pr-review.yml
+curl -o .github/workflows/gemini-pr-review.yml https://raw.githubusercontent.com/acoliver/run-llxprt-code/main/workflows/pr-review/gemini-pr-review.yml
 ```
 
 ## Usage
@@ -60,9 +60,9 @@ curl -o .github/workflows/gemini-pr-review.yml https://raw.githubusercontent.com
 The Gemini PR Review workflow is triggered by:
 
 - **New PRs**: When a pull request is opened
-- **PR Review Comments**: When a review comment contains `@gemini-cli /review`
-- **PR Reviews**: When a review body contains `@gemini-cli /review`
-- **Issue Comments**: When a comment on a PR contains `@gemini-cli /review`
+- **PR Review Comments**: When a review comment contains `@llxprt /review`
+- **PR Reviews**: When a review body contains `@llxprt /review`
+- **Issue Comments**: When a comment on a PR contains `@llxprt /review`
 - **Manual Dispatch**: Via the GitHub Actions UI ("Run workflow")
 
 ## Interaction Flow
@@ -73,9 +73,9 @@ The workflow follows a clear, multi-step process to handle review requests:
 flowchart TD
     subgraph Triggers
         A[PR Opened]
-        B[PR Review Comment with '@gemini-cli /review']
-        C[PR Review with '@gemini-cli /review']
-        D[Issue Comment with '@gemini-cli /review']
+        B[PR Review Comment with '@llxprt /review']
+        C[PR Review with '@llxprt /review']
+        D[Issue Comment with '@llxprt /review']
         E[Manual Dispatch via Actions UI]
     end
 
@@ -108,7 +108,7 @@ The workflow automatically triggers on:
 Trigger a review manually by commenting on a PR:
 
 ```
-@gemini-cli /review
+@llxprt /review
 ```
 
 ### Custom Review Instructions
@@ -116,10 +116,10 @@ Trigger a review manually by commenting on a PR:
 You can provide specific focus areas by adding instructions after the trigger:
 
 ```
-@gemini-cli /review focus on security
-@gemini-cli /review check performance and memory usage  
-@gemini-cli /review please review error handling
-@gemini-cli /review look for breaking changes
+@llxprt /review focus on security
+@llxprt /review check performance and memory usage  
+@llxprt /review please review error handling
+@llxprt /review look for breaking changes
 ```
 
 ### Manual Workflow Dispatch
@@ -194,20 +194,20 @@ The AI prompt can be customized to:
 
 ### Basic Review Request
 ```
-@gemini-cli /review
+@llxprt /review
 ```
 
 ### Security-Focused Review
 ```
-@gemini-cli /review focus on security vulnerabilities and authentication
+@llxprt /review focus on security vulnerabilities and authentication
 ```
 
 ### Performance Review
 ```
-@gemini-cli /review check for performance issues and optimization opportunities
+@llxprt /review check for performance issues and optimization opportunities
 ```
 
 ### Breaking Changes Check
 ```
-@gemini-cli /review look for potential breaking changes and API compatibility
+@llxprt /review look for potential breaking changes and API compatibility
 ```

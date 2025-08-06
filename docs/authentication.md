@@ -49,7 +49,7 @@ This is the simplest method and is suitable for projects that do not require Goo
 #### Example
 
 ```yaml
-- uses: 'google-github-actions/run-gemini-cli@v0'
+- uses: 'acoliver/run-llxprt-code@v1'
   with:
     prompt: |-
       Explain this code
@@ -161,7 +161,7 @@ After running the `setup_workload_identity.sh` script, add the following variabl
 **Example**
 
 ```yaml
-- uses: 'google-github-actions/run-gemini-cli@v0'
+- uses: 'acoliver/run-llxprt-code@v1'
   with:
     gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
     gcp_service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
@@ -195,7 +195,7 @@ After running the `setup_workload_identity.sh` script, add the following variabl
 **Example**
 
 ```yaml
-- uses: 'google-github-actions/run-gemini-cli@v0'
+- uses: 'acoliver/run-llxprt-code@v1'
   with:
     gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
     gcp_service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'

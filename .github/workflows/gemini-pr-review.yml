@@ -38,7 +38,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && github.event.action == 'opened') ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
-        contains(github.event.comment.body, '@gemini-cli /review') &&
+        contains(github.event.comment.body, '@llxprt /review') &&
         (
           github.event.comment.author_association == 'OWNER' ||
           github.event.comment.author_association == 'MEMBER' ||
@@ -46,7 +46,7 @@ jobs:
         )
       ) ||
       (github.event_name == 'pull_request_review_comment' &&
-        contains(github.event.comment.body, '@gemini-cli /review') &&
+        contains(github.event.comment.body, '@llxprt /review') &&
         (
           github.event.comment.author_association == 'OWNER' ||
           github.event.comment.author_association == 'MEMBER' ||
@@ -54,7 +54,7 @@ jobs:
         )
       ) ||
       (github.event_name == 'pull_request_review' &&
-        contains(github.event.review.body, '@gemini-cli /review') &&
+        contains(github.event.review.body, '@llxprt /review') &&
         (
           github.event.review.author_association == 'OWNER' ||
           github.event.review.author_association == 'MEMBER' ||
@@ -125,7 +125,7 @@ jobs:
 
           # Extract additional instructions from comment
           ADDITIONAL_INSTRUCTIONS="$(
-            echo "${COMMENT_BODY}" | sed 's/.*@gemini-cli \/review//' | xargs
+            echo "${COMMENT_BODY}" | sed 's/.*@llxprt \/review//' | xargs
           )"
           echo "additional_instructions=${ADDITIONAL_INSTRUCTIONS}" >> "${GITHUB_OUTPUT}"
 
@@ -152,7 +152,7 @@ jobs:
           ADDITIONAL_INSTRUCTIONS: '${{ steps.get_pr.outputs.additional_instructions || steps.get_pr_comment.outputs.additional_instructions }}'
           REPOSITORY: '${{ github.repository }}'
         with:
-          gemini_cli_version: '${{ vars.GEMINI_CLI_VERSION }}'
+          llxprt_version: '${{ vars.LLXPRT_VERSION }}'
           gcp_workload_identity_provider: '${{ vars.GCP_WIF_PROVIDER }}'
           gcp_project_id: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
           gcp_location: '${{ vars.GOOGLE_CLOUD_LOCATION }}'

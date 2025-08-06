@@ -1,6 +1,6 @@
 # Awesome Workflows
 
-Welcome to our collection of awesome community-contributed workflows! This page showcases creative and powerful implementations of the [Google Gemini CLI GitHub Action](https://github.com/google-github-actions/run-gemini-cli) created by the community.
+Welcome to our collection of awesome community-contributed workflows! This page showcases creative and powerful implementations of the [LLXPRT Code GitHub Action](https://github.com/acoliver/run-llxprt-code) created by the community.
 
 **Want to add your workflow?** Check out the [submission guidelines](./README.md#share-your-workflow) in our main README.
 

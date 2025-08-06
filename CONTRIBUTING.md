@@ -42,7 +42,7 @@ Before contributing, ensure you have:
 2. **Set Upstream Remote**
    - Add the original repository as the `upstream` remote:
      ```sh
-     git remote add upstream https://github.com/google-github-actions/run-gemini-cli.git
+     git remote add upstream https://github.com/acoliver/run-llxprt-code.git
      ```
 
 3. **Install Dependencies**
@@ -174,4 +174,4 @@ Once you submit a pull request, a member of the team will review your changes. W
 
 ## Community & Communication
 
-If you have any questions or need help with your contribution, you can reach out to us on [GitHub Discussions](https://github.com/google-github-actions/run-gemini-cli/discussions).
+If you have any questions or need help with your contribution, you can reach out to us on [GitHub Discussions](https://github.com/acoliver/run-llxprt-code/discussions).

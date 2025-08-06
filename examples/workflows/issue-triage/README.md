@@ -41,8 +41,8 @@ To implement this issue triage system, you can utilize either of the following m
 
 ```bash
 mkdir -p .github/workflows
-curl -o .github/workflows/gemini-issue-automated-triage.yml https://raw.githubusercontent.com/google-github-actions/run-gemini-cli/main/workflows/issue-triage/gemini-issue-automated-triage.yml
-curl -o .github/workflows/gemini-issue-scheduled-triage.yml https://raw.githubusercontent.com/google-github-actions/run-gemini-cli/main/workflows/issue-triage/gemini-issue-scheduled-triage.yml
+curl -o .github/workflows/gemini-issue-automated-triage.yml https://raw.githubusercontent.com/acoliver/run-llxprt-code/main/workflows/issue-triage/gemini-issue-automated-triage.yml
+curl -o .github/workflows/gemini-issue-scheduled-triage.yml https://raw.githubusercontent.com/acoliver/run-llxprt-code/main/workflows/issue-triage/gemini-issue-scheduled-triage.yml
 ```
 
 You can customize the prompts and settings in the workflow files to suit your specific needs. For example, you can change the triage logic, the labels that are applied, or the schedule of the scheduled triage.
@@ -56,7 +56,7 @@ The Issue Triage workflows are triggered by:
 - **New Issues**: When an issue is opened or reopened (automated triage)
 - **Scheduled Events**: Cron job for batch processing (scheduled triage)
 - **Manual Dispatch**: Via the GitHub Actions UI ("Run workflow")
-- **Issue Comments**: When a comment contains `@gemini-cli /triage`
+- **Issue Comments**: When a comment contains `@llxprt /triage`
 
 ### Real-Time Issue Triage
 
@@ -73,7 +73,7 @@ This workflow is defined in `workflows/issue-triage/gemini-issue-scheduled-triag
 You can manually trigger triage by commenting on an issue:
 
 ```
-@gemini-cli /triage
+@llxprt /triage
 ```
 
 ## Interaction Flow
@@ -84,7 +84,7 @@ flowchart TD
         A[Issue Opened or Reopened]
         B[Scheduled Cron Job]
         C[Manual Dispatch]
-        D[Issue Comment with '@gemini-cli /triage' Created]
+        D[Issue Comment with '@llxprt /triage' Created]
     end
 
     subgraph "Gemini CLI Workflow"
@@ -121,7 +121,7 @@ You can customize the triage workflows by modifying:
 
 ### Basic Triage Request
 ```
-@gemini-cli /triage
+@llxprt /triage
 ```
 
 ### Automatic Labeling

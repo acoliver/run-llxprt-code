@@ -12,24 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 'Run Gemini CLI'
-author: 'Google LLC'
+name: 'Run LLxprt Code'
+author: 'VybeStack'
 description: |-
-  Invoke the Gemini CLI from a GitHub Action.
+  Invoke LLxprt Code from a GitHub Action.
 
 inputs:
+  # LLxprt Code supports dual-provider mode where Gemini handles web-search/web-fetch
+  # while another provider handles chat. Set gemini_api_key AND provider/api_key for this mode.
   prompt:
     description: |-
-      A string passed to the Gemini CLI's [`--prompt` argument](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md#command-line-arguments).
+      A string passed to the LLxprt Code's [`--prompt` argument](https://github.com/acoliver/llxprt-code/blob/main/docs/cli/configuration.md#command-line-arguments).
     required: false
     default: 'You are a helpful assistant.'
   settings:
     description: |-
-      A JSON string written to `.gemini/settings.json` to configure the CLI's _project_ settings.
-      For more details, see the documentation on [settings files](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md#settings-files).
+      A JSON string written to `.llxprt/settings.json` to configure the CLI's _project_ settings.
+      For more details, see the documentation on [settings files](https://github.com/acoliver/llxprt-code/blob/main/docs/cli/configuration.md#settings-files).
+    required: false
+  provider:
+    description: 'AI provider to use (gemini, openai, anthropic, etc.)'
+    required: false
+    default: 'gemini'
+  model:
+    description: 'Model to use for the specified provider'
+    required: false
+  api_key:
+    description: 'API key for the specified provider'
+    required: false
+  api_key_file:
+    description: 'Path to file containing API key for the specified provider'
     required: false
   gemini_api_key:
-    description: 'The API key for the Gemini API.'
+    description: 'Gemini API key (for backward compatibility or ServerTools when using other providers)'
     required: false
   gcp_project_id:
     description: 'The Google Cloud project ID.'
@@ -51,25 +66,25 @@ inputs:
     description: 'A flag to indicate if Gemini Code Assist should be used.'
     required: false
     default: 'false'
-  gemini_cli_version:
-    description: 'The version of the Gemini CLI to install.'
+  llxprt_version:
+    description: 'The version of LLxprt Code to install.'
     required: false
     default: 'latest'
 
 outputs:
   summary:
-    description: 'The summarized output from the Gemini CLI execution.'
-    value: '${{ steps.gemini_run.outputs.gemini_response }}'
+    description: 'The summarized output from the LLxprt Code execution.'
+    value: '${{ steps.llxprt_run.outputs.llxprt_response }}'
 
 runs:
   using: 'composite'
   steps:
-    - name: 'Configure Gemini CLI'
+    - name: 'Configure LLxprt Code'
       if: |-
         ${{ inputs.settings != '' }}
       run: |-
-        mkdir -p .gemini/
-        echo "${SETTINGS}" > ".gemini/settings.json"
+        mkdir -p .llxprt/
+        echo "${SETTINGS}" > ".llxprt/settings.json"
       shell: 'bash'
       env:
         SETTINGS: '${{ inputs.settings }}'
@@ -95,60 +110,113 @@ runs:
       shell: 'bash'
       run: |-
         set -euo pipefail
-        mkdir -p .gemini/
-        sed "s/OTLP_GOOGLE_CLOUD_PROJECT/${OTLP_GOOGLE_CLOUD_PROJECT}/g" "${GITHUB_ACTION_PATH}/scripts/collector-gcp.yaml.template" > ".gemini/collector-gcp.yaml"
+        mkdir -p .llxprt/
+        sed "s/OTLP_GOOGLE_CLOUD_PROJECT/${OTLP_GOOGLE_CLOUD_PROJECT}/g" "${GITHUB_ACTION_PATH}/scripts/collector-gcp.yaml.template" > ".llxprt/collector-gcp.yaml"
 
         chmod 444 "$GOOGLE_APPLICATION_CREDENTIALS"
-        docker run -d --name gemini-telemetry-collector --network host \
+        docker run -d --name llxprt-telemetry-collector --network host \
           -v "${GITHUB_WORKSPACE}:/github/workspace" \
           -e "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS/$GITHUB_WORKSPACE//github/workspace}" \
           -w "/github/workspace" \
           otel/opentelemetry-collector-contrib:0.128.0 \
-          --config /github/workspace/.gemini/collector-gcp.yaml
+          --config /github/workspace/.llxprt/collector-gcp.yaml
 
-    - name: 'Install Gemini CLI'
+    - name: 'Install LLxprt Code'
       id: 'install'
       env:
-        GEMINI_CLI_VERSION: '${{ inputs.gemini_cli_version }}'
+        LLXPRT_VERSION: '${{ inputs.llxprt_version }}'
       shell: 'bash'
       run: |-
         set -euo pipefail
 
-        VERSION_INPUT="${GEMINI_CLI_VERSION:-latest}"
+        VERSION_INPUT="${LLXPRT_VERSION:-latest}"
 
         if [[ "${VERSION_INPUT}" == "latest" || "${VERSION_INPUT}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?(\+[a-zA-Z0-9\.-]+)?$ ]]; then
-          echo "Installing Gemini CLI from npm: @google/gemini-cli@${VERSION_INPUT}"
-          npm install -g @google/gemini-cli@"${VERSION_INPUT}"
+          echo "Installing LLxprt Code from npm: @vybestack/llxprt-code@${VERSION_INPUT}"
+          npm install -g @vybestack/llxprt-code@"${VERSION_INPUT}"
         else
-          echo "Installing Gemini CLI from GitHub: github:google-gemini/gemini-cli#${VERSION_INPUT}"
-          git clone https://github.com/google-gemini/gemini-cli.git
-          cd gemini-cli
+          echo "Installing LLxprt Code from GitHub: github:acoliver/llxprt-code#${VERSION_INPUT}"
+          git clone https://github.com/acoliver/llxprt-code.git
+          cd llxprt-code
           git checkout "${VERSION_INPUT}"
           npm install
           npm run bundle
           npm install -g .
         fi
         echo "Verifying installation:"
-        if command -v gemini >/dev/null 2>&1; then
-          gemini --version || echo "Gemini CLI installed successfully (version command not available)"
+        if command -v llxprt >/dev/null 2>&1; then
+          llxprt --version || echo "LLxprt Code installed successfully (version command not available)"
         else
-          echo "Error: Gemini CLI not found in PATH"
+          echo "Error: LLxprt Code not found in PATH"
           exit 1
         fi
 
-    - name: 'Run Gemini CLI'
-      id: 'gemini_run'
+    - name: 'Set provider configuration'
+      shell: 'bash'
+      run: |
+        # Export provider configuration
+        if [[ -n "${{ inputs.provider }}" ]]; then
+          echo "LLXPRT_PROVIDER=${{ inputs.provider }}" >> "${GITHUB_ENV}"
+        fi
+        
+        if [[ -n "${{ inputs.model }}" ]]; then
+          echo "LLXPRT_MODEL=${{ inputs.model }}" >> "${GITHUB_ENV}"
+        fi
+        
+        # Handle api_key - could be for any provider
+        if [[ -n "${{ inputs.api_key }}" ]]; then
+          echo "LLXPRT_API_KEY=${{ inputs.api_key }}" >> "${GITHUB_ENV}"
+        fi
+        
+        if [[ -n "${{ inputs.api_key_file }}" ]]; then
+          echo "LLXPRT_API_KEY_FILE=${{ inputs.api_key_file }}" >> "${GITHUB_ENV}"
+        fi
+
+    - name: 'Run LLxprt Code'
+      id: 'llxprt_run'
       run: |-
         set -e
-        GEMINI_RESPONSE=$(gemini --yolo --prompt "${PROMPT}")
+        
+        # Build the llxprt command with optional flags
+        LLXPRT_CMD="llxprt --yolo"
+        
+        # Add provider flag if specified
+        if [[ -n "${LLXPRT_PROVIDER}" ]]; then
+          LLXPRT_CMD="${LLXPRT_CMD} --provider ${LLXPRT_PROVIDER}"
+        fi
+        
+        # Add model flag if specified
+        if [[ -n "${LLXPRT_MODEL}" ]]; then
+          LLXPRT_CMD="${LLXPRT_CMD} --model ${LLXPRT_MODEL}"
+        fi
+        
+        # Add API key flag if specified (from api_key input)
+        if [[ -n "${LLXPRT_API_KEY}" ]]; then
+          LLXPRT_CMD="${LLXPRT_CMD} --key ${LLXPRT_API_KEY}"
+        fi
+        
+        # Add API key file flag if specified
+        if [[ -n "${LLXPRT_API_KEY_FILE}" ]]; then
+          LLXPRT_CMD="${LLXPRT_CMD} --keyfile ${LLXPRT_API_KEY_FILE}"
+        fi
+        
+        # Add the prompt (always required)
+        LLXPRT_CMD="${LLXPRT_CMD} --prompt \"${PROMPT}\""
+        
+        # Execute the command and capture response
+        LLXPRT_RESPONSE=$(eval ${LLXPRT_CMD})
         # Set the captured response as a step output, supporting multiline
-        echo "gemini_response<<EOF" >> "${GITHUB_OUTPUT}"
-        echo "${GEMINI_RESPONSE}" >> "${GITHUB_OUTPUT}"
+        echo "llxprt_response<<EOF" >> "${GITHUB_OUTPUT}"
+        echo "${LLXPRT_RESPONSE}" >> "${GITHUB_OUTPUT}"
         echo "EOF" >> "${GITHUB_OUTPUT}"
-        echo "${GEMINI_RESPONSE}"
+        echo "${LLXPRT_RESPONSE}"
       shell: 'bash'
       env:
         GEMINI_API_KEY: '${{ inputs.gemini_api_key }}'
+        LLXPRT_PROVIDER: '${{ env.LLXPRT_PROVIDER }}'
+        LLXPRT_MODEL: '${{ env.LLXPRT_MODEL }}'
+        LLXPRT_API_KEY: '${{ env.LLXPRT_API_KEY }}'
+        LLXPRT_API_KEY_FILE: '${{ env.LLXPRT_API_KEY_FILE }}'
         SURFACE: 'GitHub'
         GOOGLE_CLOUD_PROJECT: '${{ inputs.gcp_project_id }}'
         GOOGLE_CLOUD_LOCATION: '${{ inputs.gcp_location }}'

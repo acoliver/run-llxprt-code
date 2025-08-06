@@ -1,16 +1,13 @@
-# run-gemini-cli
+# run-llxprt-code
 
 ## Overview
 
-`run-gemini-cli` is a GitHub Action that integrates [Gemini] into your development workflow via the [Gemini CLI]. It acts both as an autonomous agent for critical routine coding tasks, and an on-demand collaborator you can quickly delegate work to.
+`run-llxprt-code` is a GitHub Action that integrates [LLxprt Code] into your development workflow. It acts both as an autonomous agent for critical routine coding tasks, and an on-demand collaborator you can quickly delegate work to.
 
-Use it to perform GitHub pull request reviews, triage issues, perform code analysis and modification, and more using [Gemini] conversationally (e.g., `@gemini-cli fix this issue`) directly inside your GitHub repositories.
+Use it to perform GitHub pull request reviews, triage issues, perform code analysis and modification, and more using [AI models] conversationally (e.g., `@llxprt fix this issue`) directly inside your GitHub repositories.
 
-**This is not an officially supported Google product, and it is not covered by a
-Google Cloud support contract. To report bugs or request features in a Google
-Cloud product, please contact [Google Cloud support].**
 
-- [run-gemini-cli](#run-gemini-cli)
+- [run-llxprt-code](#run-llxprt-code)
   - [Overview](#overview)
   - [Features](#features)
   - [Quick Start](#quick-start)
@@ -18,10 +15,19 @@ Cloud product, please contact [Google Cloud support].**
     - [2. Add it as a GitHub Secret](#2-add-it-as-a-github-secret)
     - [3. Choose a Workflow](#3-choose-a-workflow)
     - [4. Try it out!](#4-try-it-out)
+  - [Provider Configuration](#provider-configuration)
+    - [Anthropic Claude](#anthropic-claude)
+    - [OpenAI GPT](#openai-gpt)
+    - [Google Gemini (Default)](#google-gemini-default)
+    - [Dual-Provider Mode (Advanced)](#dual-provider-mode-advanced)
   - [Workflows](#workflows)
     - [Issue Triage](#issue-triage)
     - [Pull Request Review](#pull-request-review)
     - [Gemini CLI Assistant](#gemini-cli-assistant)
+  - [Migration from run-gemini-cli](#migration-from-run-gemini-cli)
+    - [Quick Migration](#quick-migration)
+    - [Taking Advantage of New Features](#taking-advantage-of-new-features)
+    - [Backward Compatibility](#backward-compatibility)
     - [Inputs](#inputs)
     - [Outputs](#outputs)
     - [Repository Variables](#repository-variables)
@@ -29,23 +35,26 @@ Cloud product, please contact [Google Cloud support].**
   - [Authentication](#authentication)
     - [Google Authentication](#google-authentication)
     - [GitHub Authentication](#github-authentication)
+    - [Examples](#examples)
   - [Observability](#observability)
   - [Customization](#customization)
   - [Contributing](#contributing)
 
 ## Features
 
-- **Automation**: Trigger workflows based on events (e.g. issue opening) or schedules (e.g. nightly).
-- **On-demand Collaboration**: Trigger workflows in issue and pull request
-  comments by mentioning the [Gemini CLI] (e.g., `@gemini-cli /review`).
-- **Extensible with Tools**: Leverage [Gemini] models' tool-calling capabilities to
-  interact with other CLIs like the [GitHub CLI] (`gh`).
+- **Multi-Provider Support**: Use Anthropic Claude, OpenAI GPT, Google Gemini, and more
+- **Flexible Authentication**: API keys, OAuth, and Workload Identity Federation
+- **Dual-Provider Mode**: Use Gemini for web search while using another provider for chat
+- **Backward Compatible**: Existing Gemini workflows continue to work
+- **Automation**: Trigger workflows based on events or schedules
+- **On-demand Collaboration**: Use `@llxprt` in comments to get AI assistance
+- **Extensible with Tools**: Leverage tool-calling capabilities across providers
 - **Customizable**: Use a `GEMINI.md` file in your repository to provide
-  project-specific instructions and context to [Gemini CLI].
+  project-specific instructions and context to [LLxprt Code]
 
 ## Quick Start
 
-Get started with Gemini CLI in your repository in just a few minutes:
+Get started with LLxprt Code in your repository in just a few minutes:
 
 ### 1. Get a Gemini API Key
 Obtain your API key from [Google AI Studio] with generous free-of-charge quotas
@@ -77,21 +86,61 @@ You have two options to set up a workflow:
 
 ### 4. Try it out!
 
+## Provider Configuration
+
+LLxprt Code supports multiple AI providers. Configure your preferred provider using action inputs:
+
+### Anthropic Claude
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'anthropic'
+    model: 'claude-3-5-sonnet-20241022'  # Optional, uses provider default if not specified
+    api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
+```
+
+### OpenAI GPT
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'openai'
+    model: 'gpt-4-turbo-preview'  # Optional
+    api_key: '${{ secrets.OPENAI_API_KEY }}'
+```
+
+### Google Gemini (Default)
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
+    # OR use OAuth (no key needed)
+```
+
+### Dual-Provider Mode (Advanced)
+Use Gemini for web search/fetch while using another provider for chat:
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'anthropic'
+    api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
+    gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'  # Enables web tools
+```
+
 **Pull Request Review:**
 - Open a pull request in your repository and wait for automatic review
-- Comment `@gemini-cli /review` on an existing pull request to manually trigger a review
+- Comment `@llxprt /review` on an existing pull request to manually trigger a review
 
 **Issue Triage:**
 - Open an issue and wait for automatic triage
-- Comment `@gemini-cli /triage` on existing issues to manually trigger triaging
+- Comment `@llxprt /triage` on existing issues to manually trigger triaging
 
 **General AI Assistance:**
-- In any issue or pull request, mention `@gemini-cli` followed by your request
+- In any issue or pull request, mention `@llxprt` followed by your request
 - Examples:
-  - `@gemini-cli explain this code change`
-  - `@gemini-cli suggest improvements for this function`
-  - `@gemini-cli help me debug this error`
-  - `@gemini-cli write unit tests for this component`
+  - `@llxprt explain this code change`
+  - `@llxprt suggest improvements for this function`
+  - `@llxprt help me debug this error`
+  - `@llxprt write unit tests for this component`
 
 ## Workflows
 
@@ -116,16 +165,58 @@ AI assistant within the pull requests and issues to perform a wide range of
 tasks. For a detailed guide on how to set up the general-purpose Gemini CLI workflow,
 go to the [Gemini CLI workflow documentation](./examples/workflows/gemini-cli).
 
+## Migration from run-gemini-cli
+
+If you're currently using `google-github-actions/run-gemini-cli`, migration is straightforward:
+
+### Quick Migration
+1. **Update your workflow file:**
+   ```yaml
+   # Old:
+   - uses: 'google-github-actions/run-gemini-cli@v0'
+   
+   # New:
+   - uses: 'acoliver/run-llxprt-code@v1'
+   ```
+
+2. **Update command references:**
+   - Change `@gemini-cli` to `@llxprt` in your comments
+   - Update any documentation or templates
+
+3. **Your existing configuration continues to work:**
+   ```yaml
+   with:
+     gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'
+   ```
+
+### Taking Advantage of New Features
+Once migrated, you can:
+- Switch to other providers (Anthropic, OpenAI)
+- Use dual-provider mode for enhanced capabilities
+- Leverage provider-specific models and features
+
+### Backward Compatibility
+- All existing Gemini authentication methods still work
+- Default provider is Gemini when not specified
+- `GEMINI_API_KEY` environment variable is still supported
+
 ### Inputs
 
 <!-- BEGIN_AUTOGEN_INPUTS -->
 
--   <a name="prompt"></a><a href="#user-content-prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ A string passed to the Gemini CLI's [`--prompt` argument](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md#command-line-arguments).
+-   <a name="provider"></a><a href="#user-content-provider"><code>provider</code></a>: _(Optional, default: `gemini`)_ The AI provider to use (anthropic, openai, gemini, etc.)
 
--   <a name="settings"></a><a href="#user-content-settings"><code>settings</code></a>: _(Optional)_ A JSON string written to `.gemini/settings.json` to configure the CLI's _project_ settings.
-    For more details, see the documentation on [settings files](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md#settings-files).
+-   <a name="model"></a><a href="#user-content-model"><code>model</code></a>: _(Optional)_ The model to use for the specified provider. If not set, uses provider defaults.
 
--   <a name="gemini_api_key"></a><a href="#user-content-gemini_api_key"><code>gemini_api_key</code></a>: _(Optional)_ The API key for the Gemini API.
+-   <a name="api_key"></a><a href="#user-content-api_key"><code>api_key</code></a>: _(Optional)_ API key for the specified provider.
+
+-   <a name="api_key_file"></a><a href="#user-content-api_key_file"><code>api_key_file</code></a>: _(Optional)_ Path to file containing the API key.
+
+-   <a name="prompt"></a><a href="#user-content-prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ The prompt to pass to LLxprt Code.
+
+-   <a name="settings"></a><a href="#user-content-settings"><code>settings</code></a>: _(Optional)_ A JSON string written to `.llxprt/settings.json` to configure the CLI's _project_ settings.
+
+-   <a name="gemini_api_key"></a><a href="#user-content-gemini_api_key"><code>gemini_api_key</code></a>: _(Optional)_ Gemini API key for backward compatibility or ServerTools in dual-provider mode.
 
 -   <a name="gcp_project_id"></a><a href="#user-content-gcp_project_id"><code>gcp_project_id</code></a>: _(Optional)_ The Google Cloud project ID.
 
@@ -139,7 +230,7 @@ go to the [Gemini CLI workflow documentation](./examples/workflows/gemini-cli).
 
 -   <a name="use_gemini_code_assist"></a><a href="#user-content-use_gemini_code_assist"><code>use_gemini_code_assist</code></a>: _(Optional, default: `false`)_ A flag to indicate if Gemini Code Assist should be used.
 
--   <a name="gemini_cli_version"></a><a href="#user-content-gemini_cli_version"><code>gemini_cli_version</code></a>: _(Optional, default: `latest`)_ The version of the Gemini CLI to install.
+-   <a name="llxprt_version"></a><a href="#user-content-llxprt_version"><code>llxprt_version</code></a>: _(Optional, default: `latest`)_ Version of LLxprt Code to install.
 
 
 <!-- END_AUTOGEN_INPUTS -->
@@ -159,7 +250,7 @@ We recommend setting the following values as repository variables so they can be
 
 | Name                        | Description                                            | Type     | Required | When Required             |
 | --------------------------- | ------------------------------------------------------ | -------- | -------- | ------------------------- |
-| `GEMINI_CLI_VERSION`        | Controls which version of the Gemini CLI is installed. | Variable | No       | Pinning the CLI version   |
+| `LLXPRT_VERSION`            | Controls which version of LLxprt Code is installed.   | Variable | No       | Pinning the CLI version   |
 | `GCP_WIF_PROVIDER`          | Full resource name of the Workload Identity Provider.  | Variable | No       | Using Google Cloud        |
 | `GOOGLE_CLOUD_PROJECT`      | Google Cloud project for inference and observability.  | Variable | No       | Using Google Cloud        |
 | `SERVICE_ACCOUNT_EMAIL`     | Google Cloud service account email address.            | Variable | No       | Using Google Cloud        |
@@ -217,11 +308,43 @@ You can authenticate with GitHub in two ways:
 For detailed setup instructions for both Google and GitHub authentication, go to the
 [**Authentication documentation**](./docs/authentication.md).
 
+### Examples
+
+#### PR Review with Claude
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'anthropic'
+    model: 'claude-3-5-sonnet-20241022'
+    api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
+    prompt: 'Review this pull request for code quality and potential issues'
+```
+
+#### Issue Triage with GPT-4
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'openai'
+    model: 'gpt-4-turbo-preview'
+    api_key: '${{ secrets.OPENAI_API_KEY }}'
+    prompt: 'Triage this issue and suggest appropriate labels'
+```
+
+#### Dual-Provider: Claude + Gemini Web Tools
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'anthropic'
+    api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
+    gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'  # Enables web search capabilities
+    prompt: 'Research this issue and provide a comprehensive analysis'
+```
+
 ## Observability
 
 This action can be configured to send telemetry data (traces, metrics, and logs)
 to your own Google Cloud project. This allows you to monitor the performance and
-behavior of the [Gemini CLI] within your workflows, providing valuable insights
+behavior of the [LLxprt Code] within your workflows, providing valuable insights
 for debugging and optimization.
 
 For detailed instructions on how to set up and configure observability, go to
@@ -230,13 +353,13 @@ the [Observability documentation](./docs/observability.md).
 ## Customization
 
 Create a [GEMINI.md] file in the root of your repository to provide
-project-specific context and instructions to [Gemini CLI]. This is useful for defining
+project-specific context and instructions to [LLxprt Code]. This is useful for defining
 coding conventions, architectural patterns, or other guidelines the model should
 follow for a given repository.
 
 ## Contributing
 
-Contributions are welcome! Check out the Gemini CLI
+Contributions are welcome! Check out the LLxprt Code
 [**Contributing Guide**](./CONTRIBUTING.md) for more details on how to get
 started.
 
