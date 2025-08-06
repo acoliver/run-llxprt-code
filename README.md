@@ -49,7 +49,7 @@ Use it to perform GitHub pull request reviews, triage issues, perform code analy
 - **Automation**: Trigger workflows based on events or schedules
 - **On-demand Collaboration**: Use `@llxprt` in comments to get AI assistance
 - **Extensible with Tools**: Leverage tool-calling capabilities across providers
-- **Customizable**: Use a `GEMINI.md` file in your repository to provide
+- **Customizable**: Use a `LLXPRT.md` file in your repository to provide
   project-specific instructions and context to [LLxprt Code]
 
 ## Quick Start
@@ -95,17 +95,26 @@ LLxprt Code supports multiple AI providers. Configure your preferred provider us
 - uses: 'acoliver/run-llxprt-code@v1'
   with:
     provider: 'anthropic'
-    model: 'claude-3-5-sonnet-20241022'  # Optional, uses provider default if not specified
+    model: 'claude-opus-4-1-20250805'  # Optional, uses provider default if not specified
     api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
 ```
 
-### OpenAI GPT
+### OpenRouter
 ```yaml
 - uses: 'acoliver/run-llxprt-code@v1'
   with:
-    provider: 'openai'
-    model: 'gpt-4-turbo-preview'  # Optional
-    api_key: '${{ secrets.OPENAI_API_KEY }}'
+    provider: 'openrouter'
+    model: 'openai/gpt-oss-120b'  # Optional
+    api_key: '${{ secrets.OPENROUTER_API_KEY }}'
+```
+
+### Fireworks AI
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'fireworks'
+    model: 'fireworks/qwen3-coder-480b-a35b-instruct'  # Optional
+    api_key: '${{ secrets.FIREWORKS_API_KEY }}'
 ```
 
 ### Google Gemini (Default)
@@ -315,18 +324,18 @@ For detailed setup instructions for both Google and GitHub authentication, go to
 - uses: 'acoliver/run-llxprt-code@v1'
   with:
     provider: 'anthropic'
-    model: 'claude-3-5-sonnet-20241022'
+    model: 'claude-opus-4-1-20250805'
     api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
     prompt: 'Review this pull request for code quality and potential issues'
 ```
 
-#### Issue Triage with GPT-4
+#### Issue Triage with OpenRouter GPT-OSS
 ```yaml
 - uses: 'acoliver/run-llxprt-code@v1'
   with:
-    provider: 'openai'
-    model: 'gpt-4-turbo-preview'
-    api_key: '${{ secrets.OPENAI_API_KEY }}'
+    provider: 'openrouter'
+    model: 'openai/gpt-oss-120b'
+    api_key: '${{ secrets.OPENROUTER_API_KEY }}'
     prompt: 'Triage this issue and suggest appropriate labels'
 ```
 
@@ -338,6 +347,16 @@ For detailed setup instructions for both Google and GitHub authentication, go to
     api_key: '${{ secrets.ANTHROPIC_API_KEY }}'
     gemini_api_key: '${{ secrets.GEMINI_API_KEY }}'  # Enables web search capabilities
     prompt: 'Research this issue and provide a comprehensive analysis'
+```
+
+#### Code Analysis with Fireworks AI
+```yaml
+- uses: 'acoliver/run-llxprt-code@v1'
+  with:
+    provider: 'fireworks'
+    model: 'fireworks/qwen3-coder-480b-a35b-instruct'
+    api_key: '${{ secrets.FIREWORKS_API_KEY }}'
+    prompt: 'Analyze this codebase for potential optimizations and improvements'
 ```
 
 ## Observability
@@ -352,7 +371,7 @@ the [Observability documentation](./docs/observability.md).
 
 ## Customization
 
-Create a [GEMINI.md] file in the root of your repository to provide
+Create a [LLXPRT.md] file in the root of your repository to provide
 project-specific context and instructions to [LLxprt Code]. This is useful for defining
 coding conventions, architectural patterns, or other guidelines the model should
 follow for a given repository.
@@ -371,4 +390,4 @@ started.
 [Google Cloud support]: https://cloud.google.com/support
 [variables]: https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables#creating-configuration-variables-for-a-repository
 [GitHub CLI]: https://docs.github.com/en/github-cli/github-cli
-[GEMINI.md]: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md#context-files-hierarchical-instructional-context
+[LLXPRT.md]: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md#context-files-hierarchical-instructional-context
